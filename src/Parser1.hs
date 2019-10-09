@@ -49,11 +49,8 @@ mainUrl = URL "https://www.philharmonia.spb.ru"
 makeUrl :: Int -> Int -> URL
 makeUrl month year = URL $ (urlToStr mainUrl) ++ "/afisha/?ev_y=" ++ (show year) ++ "&ev_m=" ++ (show month)
 
-oneItemTag :: TagClassName
-oneItemTag = TagClassName "afisha_list_item zal"
-
-dataTag :: TagClassName
-dataTag = TagClassName "afisha_li_data"
+-- dataTag :: TagClassName
+-- dataTag = TagClassName "afisha_li_data"
 
 dayTag :: TagClassName
 dayTag = TagClassName "date_day"
@@ -61,14 +58,14 @@ dayTag = TagClassName "date_day"
 timeTag :: TagClassName
 timeTag = TagClassName "date_h"
 
-imgTag :: TagClassName
-imgTag = TagClassName "afisha_li_img"
+-- imgTag :: TagClassName
+-- imgTag = TagClassName "afisha_li_img"
 
-descriptionTag :: TagClassName
-descriptionTag = TagClassName "afisha_li_descr"
+-- descriptionTag :: TagClassName
+-- descriptionTag = TagClassName "afisha_li_descr"
 
-priceTag :: TagClassName
-priceTag = TagClassName "afisha_li_function"
+-- priceTag :: TagClassName
+-- priceTag = TagClassName "afisha_li_function"
 
 
 startContentTag :: TagClassName
@@ -77,13 +74,13 @@ startContentTag = TagClassName "afisha_list_items"
 lastContentTag :: TagClassName
 lastContentTag = TagClassName "bottom_sponsor"
 
-titleTag :: TagClassName
-titleTag = TagClassName "mer_item_title hand"
-
-
 data Date = Date { day :: Int, month :: Int, year :: Int, time :: String} deriving (Eq, Show)
 data Price = Price Int Int
-data Concert = Concert {concertDate :: Date, concertPrice :: Maybe Price, concertInfo :: T.Text }
+-- data Music = Music {}
+data Person = Person { name :: LBS.ByteString, role :: LBS.ByteString, personId :: Int } deriving (Show)
+data Info = Info { title :: LBS.ByteString, moreInfo :: LBS.ByteString, persons :: [Person],
+                   ansambles :: [LBS.ByteString], music::[LBS.ByteString] }
+data Concert = Concert {concertDate :: Date, concertPrice :: Maybe Price, concertInfo :: Info }
 
 -- isEmptyList::[[Tag LBS.ByteString]] -> Bool
 -- isEmptyList x = x /= []
@@ -101,9 +98,6 @@ fromTagToTag :: TagClassName -> TagClassName -> [Tag LBS.ByteString] -> [Tag LBS
 fromTagToTag start end tags = takeWhile (not . (isClassInTag end)) $
                               tail $ dropWhile (not . (isClassInTag start)) tags
 
-mainContent :: [Tag LBS.ByteString] -> [Tag LBS.ByteString]
-mainContent = fromTagToTag startContentTag lastContentTag
-
 getTextFromTags :: [Tag LBS.ByteString] -> LBS.ByteString
 getTextFromTags tags = delSpaces $ map fromTagText $ filter isTagText tags
             where
@@ -120,12 +114,54 @@ getIntFromTag :: [Tag LBS.ByteString] -> TagClassName -> Int
 getIntFromTag tags className = fst $ fromJust $ LBS.readInt $
                 getOneElemFromTags tags className 0
 
+-- TODO: fix month and year
 parseDate :: [Tag LBS.ByteString] -> Date
 parseDate block = Date {day = dayFromTag, month = 10, year = 2019, time = timeFromTag}
             where
                 timeFromTag = LBS.unpack $ getOneElemFromTags block timeTag 0
                 dayFromTag = getIntFromTag block dayTag
 
+parseInfoTags :: [Tag LBS.ByteString] -> Info
+parseInfoTags tags =
+             let block = fromTagToTag (TagClassName "td right") (TagClassName "afisha_element_slider_next") tags
+                 elementAge = TagClassName "afisha_element_age"
+                 titleTag = TagClassName "afisha_element_title"
+                 elementInfo = TagClassName "afisha_element_dett"
+                 personsTag = TagClassName "ae_persons_main"
+                 ansamblesTag = TagClassName "ansambles"
+                 ansambleTag = TagClassName "ansamble_title"
+                 musicTag = TagClassName "td ae_music"
+                 in let
+                        mainTitle = getTextFromTags titleBlock
+                            where titleBlock = fromTagToTag titleTag elementAge block
+                        mInfo = if L.any (isClassInTag elementInfo) block
+                            then getTextFromTags infoBlock
+                            else LBS.empty
+                           where infoBlock = fromTagToTag elementInfo personsTag block
+                        peoples = if L.any (isClassInTag personsTag) block
+                            then map parsePeople $ partitions (isClassInTag (TagClassName "ae_persons_maini ta")) $
+                                fromTagToTag personsTag ansamblesTag block
+                            else []
+                        curAnsambles = if L.any (isClassInTag ansambleTag) ansamblesBlock
+                            then map getTextFromTags $ take 3 $ partitions (isClassInTag ansambleTag) ansamblesBlock
+                            else []
+                           where  ansamblesBlock = fromTagToTag ansamblesTag musicTag block
+                        curMusic = map getTextFromTags $
+                                partitions (isClassInTag (TagClassName "ae_music_auithor_o")) musicBlock
+                           where musicBlock = dropWhile (not . (isClassInTag musicTag)) block
+                    in
+                     Info {title = mainTitle,
+                           moreInfo = mInfo,
+                           persons = peoples,
+                           ansambles = curAnsambles,
+                           music = curMusic}
+
+
+parsePeople :: [Tag LBS.ByteString] -> Person
+parsePeople tags = Person {name = personName, role = personRole }
+            where
+                personName = getTextFromTags $ fromTagToTag (TagClassName "nam") (TagClassName "rol") tags
+                personRole = getTextFromTags $ dropWhile (not . (isClassInTag (TagClassName "rol"))) tags
 
 -- parseOneBlock :: [Tag LBS.ByteString] -> Concert
 -- parseOneBlock block = Concert {date = dateFromBlock, }
@@ -135,15 +171,19 @@ parseDate block = Date {day = dayFromTag, month = 10, year = 2019, time = timeFr
 parseAfishaList :: LBS.ByteString -> [[Tag LBS.ByteString]]
 parseAfishaList body = partitions (isClassInTag oneItemTag) $ mainContent tagList
             where
+                oneItemTag :: TagClassName
+                oneItemTag = TagClassName "afisha_list_item zal"
                 tagList :: [Tag LBS.ByteString]
                 tagList = parseTags body
+                mainContent :: [Tag LBS.ByteString] -> [Tag LBS.ByteString]
+                mainContent = fromTagToTag startContentTag lastContentTag
 
-parseInfo :: [Tag LBS.ByteString] -> URL
-parseInfo block = urlInfo
+
+getInfoUrl :: [Tag LBS.ByteString] -> URL
+getInfoUrl block = URL $ (urlToStr mainUrl) ++
+                         (fromAttrib "href" $ LBS.unpack <$> head (dropWhile (not . (isClassInTag titleTag)) block))
             where
-                urlInfo = URL $ (urlToStr mainUrl) ++ (fromAttrib "href" $ LBS.unpack <$> head (dropWhile (not . (isClassInTag titleTag)) block))
-
-
+                titleTag = TagClassName "mer_item_title hand"
 
 getHtml :: URL -> IO (LBS.ByteString)
 getHtml (URL url) = do
@@ -152,23 +192,63 @@ getHtml (URL url) = do
               response <- httpLbs request manager
               return $ responseBody response
 
-getHtmlStr :: [URL] -> LBS.ByteString -> IO ()
+-- getHtmlSp :: URL -> Manager -> IO ()
+-- getHtmlSp (URL url) manager = do
+--          request <- parseRequest url
+--          withResponse request manager $ \response -> do
+--                 putStrLn $ "The status code was: " ++
+--                            show (statusCode $ responseStatus response)
+--                 let loop = do
+--                                 bs <- brRead $ responseBody response
+--                                 if S.null bs
+--                                     then putStrLn "\nFinished response body"
+--                                     else do
+--                                         S.hPut stdout bs
+--                                         loop
+--                 loop
+
+getHtmlStr :: [URL] -> [LBS.ByteString] -> IO ([LBS.ByteString])
 getHtmlStr [] res = return res
-getHtmlStr x:urls = do
-              map getHtml urls
+getHtmlStr (x:urls) res = do
+                  res2 <- getHtml x
+                  print $ L.length urls
+                  getHtmlStr urls (res2:res)
+
+--                  res2 <- getHtml x
+--                  print $ L.length urls
+--                  getHtmlStr urls (res2:res)
+
+-- fromIo :: [IO (LBS.ByteString)] -> IO ([Info])
+-- fromIo [] = return []
+-- fromIo (x:xs) = do
+--                 x' <- x
+--                 let tags = parseTags x'
+--                 let res = parseInfoTags tags
+--                 res2 <- fromIo xs
+--                 return $ (res:res2)
+-- testUrl = URL "https://www.philharmonia.spb.ru/afisha/323968/"
+testUrl = URL "https://www.philharmonia.spb.ru/afisha/329945/"
 
 parseFun :: IO ()
 parseFun = do
+--             manager <- newManager tlsManagerSettings
             body <- getHtml (makeUrl 10 2019)
-            let items = parseAfishaList body
---             let dates = map (show . parseDate) items
-            let infoUrls = map (parseInfo) items
-            let strs = parseTags <$> getHtmlStr infoUrls
-            print $ L.length strs
+--             body <- getHtml testUrl
+            let blocks = parseAfishaList body
+            let dates = map (show . parseDate) blocks
+--             let infoUrls = map getInfoUrl blocks
+--             infos <- sequence $ map getHtml infoUrls
+--             print $ L.length $ map (parseInfoTags . parseTags) infos
+--             print $ parseInfoTags $ parseTags $ head infos
+--             let infos = parseInfoTags $ parseTags body
+--             LBS.putStrLn $ title infos
+--             LBS.putStrLn $ moreInfo infos
+--             LBS.putStrLn $ LBS.unlines $ music infos
+--             LBS.putStrLn $ LBS.unlines $ ansambles infos
 --             putStrLn $ L.intercalate "###\n##" info
 
 --             map (LBS.unwords . LBS.words) (parseFromTag body)
---             LBS.putStrLn $ LBS.unlines $ prices
+--             LBS.putStrLn $ LBS.unwords . LBS.words $ oneInfo
 --             LBS.putStrLn $ LBS.unlines (fromTagToTag tag1 tag1 (parseTags body))
 --             body2 <- getHtml (makeUrl 11 2019)
 --             $ LBS.intercalate "#####"
