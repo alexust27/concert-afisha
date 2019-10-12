@@ -22,7 +22,6 @@ module Common
 import Network.HTTP.Client (httpLbs, newManager, parseRequest, responseBody)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 -- import Network.HTTP.Types.Status (statusCode)
--- import Text.Html.Encoding.Detection
 import Text.HTML.TagSoup (Tag, Tag ( TagOpen ), isTagText, fromAttrib, fromTagText)
 import qualified Data.Text as T
 import qualified Data.List as L
@@ -42,24 +41,24 @@ data Price = Price ( [Int]
                    , URL
                    ) deriving (Eq, Show)
 
-data Person = Person { name       :: LBS.ByteString
-                     , role       :: LBS.ByteString
+data Person = Person { name       :: String
+                     , role       :: String
                      , personId   :: String
                      } deriving (Show, Eq)
 
-data Info = Info { title      :: [LBS.ByteString]
-                 , moreInfo   :: LBS.ByteString
+data Info = Info { title      :: [String]
+                 , moreInfo   :: String
                  , persons    :: [Person]
-                 , ansambles  :: [LBS.ByteString]
-                 , music      :: [LBS.ByteString]
-                 }
+                 , ansambles  :: [String]
+                 , music      :: [String]
+                 } deriving (Show)
 
 data Concert = Concert { concertDate    :: Date
                        , concertInfo    :: Info
-                       , concertPlace   :: LBS.ByteString
+                       , concertPlace   :: String
                        , concertPrice   :: Maybe Price
                        , urlAbout       :: URL
-                       }
+                       } deriving (Show)
 
 -- months = [1..12] :: [Int]
 -- years = [2019..] :: [Int]
@@ -116,19 +115,19 @@ getHtml (URL url) = do
 
 printConcert :: Concert -> IO()
 printConcert concert = do
-  (LBS.putStrLn . LBS.unlines . title . concertInfo) concert
+  (putStrLn . unlines . title . concertInfo) concert
   (print . concertDate) concert
   case concertPrice concert of
     Nothing -> putStrLn "No tickects"
     Just pr -> print pr
-  (LBS.putStrLn . concertPlace) concert
+  (putStrLn . concertPlace) concert
   let people = (persons . concertInfo) concert
-  mapM_ (LBS.putStrLn . name) people
+  mapM_ (putStrLn . name) people
   mapM_ (print . personId) people
 
-  (LBS.putStrLn . moreInfo . concertInfo) concert
+  (putStrLn . moreInfo . concertInfo) concert
   (print . urlAbout) concert
-  print "-----------------------------------"
+  putStrLn "-----------------------------------"
 
 
 -- Берет все теги из блока с заданным тегом не включая этот тег

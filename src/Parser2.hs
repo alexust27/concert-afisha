@@ -8,6 +8,7 @@ import Common ( Concert(..), Date(..), Info(..), Person(..), Price(..), TagClass
 
 import Data.Char (isDigit, isSpace, chr)
 import Data.Maybe (catMaybes)
+import Data.ByteString.Lazy.UTF8 (toString)
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import qualified Data.List as L
 import qualified Data.Text as T
@@ -20,8 +21,8 @@ makeUrl :: Int -> Int -> URL
 makeUrl m y = URL $ (urlToStr mainUrl) ++ "/ru/playbill/playbill/?year=" ++ (show y) ++ "&month=" ++ (show m)
 
 
-parsePlace :: [Tag LBS.ByteString] -> LBS.ByteString
-parsePlace block = getTextFromTags $ take 2 $ dropWhile (~/= "<span itemprop=\"location\">") block
+parsePlace :: [Tag LBS.ByteString] -> String
+parsePlace block = toString $ getTextFromTags $ take 2 $ dropWhile (~/= "<span itemprop=\"location\">") block
 
 
 parseDate :: [Tag LBS.ByteString] -> Date
@@ -69,18 +70,18 @@ getInfoUrl block = URL $ (urlToStr mainUrl)
 
 
 parseInfoTags :: [Tag LBS.ByteString] -> Info
-parseInfoTags tags = Info { title = [mainTitle, addTitle]
-                          , moreInfo = mInfo
-                          , persons = peoples
+parseInfoTags tags = Info { title     = [mainTitle, addTitle]
+                          , moreInfo  = mInfo
+                          , persons   = peoples
                           , ansambles = []
-                          , music = []
+                          , music     = []
                           }
   where
     block = takeWhile (~/= "<div id=\"soc_net\">") $ dropWhile (~/= "<div id=\"spec_info_container\">") tags
     titleBlocks = filter isTagText $ dropWhile (~/="<span itemprop=\"summary\">") tags
-    mainTitle = getTextFromTags [(titleBlocks !! 0)]
-    addTitle = getTextFromTags [(titleBlocks !! 1)]
-    mInfo = getTextFromTags block
+    mainTitle = toString $ getTextFromTags [(titleBlocks !! 0)]
+    addTitle = toString $ getTextFromTags [(titleBlocks !! 1)]
+    mInfo = toString $ getTextFromTags block
     peoples = if L.any (~== "<a>") block
               then catMaybes $ map parsePeople $ partitions (~== "<a>") block
               else []
@@ -89,10 +90,13 @@ parseInfoTags tags = Info { title = [mainTitle, addTitle]
 parsePeople :: [Tag LBS.ByteString] -> Maybe Person
 parsePeople tags = if L.length maybePerson > 2
                    then Nothing
-                   else Just $ Person {name = personName, role = LBS.pack "undefined", personId = personRef }
+                   else Just $ Person { name     = personName
+                                      , role     = "undefined"
+                                      , personId = personRef
+                                      }
                    where
                      maybePerson = LBS.words $ getTextFromTags $ take 3 tags
-                     personName = LBS.unwords maybePerson
+                     personName = toString $ LBS.unwords maybePerson
                      personRef = (urlToStr mainUrl) ++ (fromAttrib "href" $ LBS.unpack <$> (head tags))
 
 
@@ -104,12 +108,12 @@ parseOneConcertBlock block = do
   let infoUrl = getInfoUrl block
   infos <- getHtml infoUrl
   let allInfo = (parseInfoTags . parseTags) infos
-  let concert = Concert { concertDate = oneDate
-                         , concertPlace = onePlace
-                         , concertPrice = onePrice
-                         , concertInfo = allInfo
-                         , urlAbout = infoUrl
-                         }
+  let concert = Concert { concertDate   = oneDate
+                        , concertPlace  = onePlace
+                        , concertPrice  = onePrice
+                        , concertInfo   = allInfo
+                        , urlAbout      = infoUrl
+                        }
   return concert
 
 

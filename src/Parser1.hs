@@ -11,6 +11,15 @@ import qualified Data.List as L
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import Text.HTML.TagSoup (Tag, (~/=),(~==), fromAttrib, parseTags, partitions)
 
+
+toUtfString :: LBS.ByteString -> String
+toUtfString = map (\chr -> case lookup chr rusTable of
+                           Just x -> x
+                           _ -> chr
+                  ) . LBS.unpack
+  where rusTable = zip (('\168'):('\184'):['\192'..'\255']) (('Ё'):('ё'):['А'..'я'])
+
+
 mainUrl :: URL
 mainUrl = URL "https://www.philharmonia.spb.ru"
 
@@ -29,14 +38,13 @@ parseDate m y block = Date { day = dayFromTag
     dayFromTag = getIntFromTag block dayTag
 
 parseInfoTags :: [Tag LBS.ByteString] -> Info
-parseInfoTags tags = Info { title = mainTitle
-                          , moreInfo = mInfo
-                          , persons = peoples
+parseInfoTags tags = Info { title     = mainTitle
+                          , moreInfo  = mInfo
+                          , persons   = peoples
                           , ansambles = curAnsambles
-                          , music = curMusic
+                          , music     = curMusic
                           }
   where
-    block = fromTagToTag (TagClassName "td right") (TagClassName "afisha_element_slider_next") tags
     elementAge   = TagClassName "afisha_element_age"
     titleTag     = TagClassName "afisha_element_title"
     elementInfo  = TagClassName "afisha_element_dett"
@@ -47,23 +55,27 @@ parseInfoTags tags = Info { title = mainTitle
     musicTag     = TagClassName "td ae_music"
     musicianTag  = TagClassName "ae_music_auithor_o"
 
-    titleBlock = fromTagToTag titleTag elementAge block
-    infoBlock = fromTagToTag elementInfo personsTag block
-    ansamblesBlock = fromTagToTag ansamblesTag musicTag block
-    musicBlock = dropWhile (not . (isClassInTag musicTag)) block
+    block           = fromTagToTag (TagClassName "td right") (TagClassName "afisha_element_slider_next") tags
+    titleBlock      = fromTagToTag titleTag elementAge block
+    infoBlock       = fromTagToTag elementInfo personsTag block
+    ansamblesBlock  = fromTagToTag ansamblesTag musicTag block
+    musicBlock      = dropWhile (not . (isClassInTag musicTag)) block
 
-    mainTitle = [getTextFromTags titleBlock]
-    mInfo = if L.any (isClassInTag elementInfo) block
-            then getTextFromTags infoBlock
-            else LBS.empty
-    peoples = if L.any (isClassInTag personsTag) block
-              then catMaybes $ map parsePeople $ partitions (isClassInTag (onePersonTag))
-                             $ fromTagToTag personsTag ansamblesTag block
-              else []
-    curAnsambles = if L.any (isClassInTag ansambleTag) ansamblesBlock
-                   then map getTextFromTags $ take 3 $ partitions (isClassInTag ansambleTag) ansamblesBlock
+    mainTitle = [toUtfString $ getTextFromTags titleBlock]
+    mInfo     = if L.any (isClassInTag elementInfo) block
+                then toUtfString $ getTextFromTags infoBlock
+                else ""
+    peoples   = if L.any (isClassInTag personsTag) block
+                then catMaybes $ map parsePeople $ partitions (isClassInTag (onePersonTag))
+                               $ fromTagToTag personsTag ansamblesTag block
+                else []
+    curAnsambles = if L.any (isClassInTag ansambleTag) block
+                   then map (toUtfString . getTextFromTags) $ take 3
+                        $ partitions (isClassInTag ansambleTag) ansamblesBlock
                    else []
-    curMusic = map getTextFromTags $ partitions (isClassInTag (musicianTag)) musicBlock
+    curMusic     = if L.any (isClassInTag musicianTag) block
+                   then map (toUtfString . getTextFromTags) $ partitions (isClassInTag (musicianTag)) musicBlock
+                   else []
 
 
 parsePeople :: [Tag LBS.ByteString] -> Maybe Person
@@ -74,9 +86,9 @@ parsePeople tags = if needSave then
                                }
                    else Nothing
   where
-    block = fromTagToTag (TagClassName "nam") (TagClassName "rol") tags
-    personName = getTextFromTags block
-    personRole = getTextFromTags $ dropWhile (not . (isClassInTag (TagClassName "rol"))) tags
+    block      = fromTagToTag (TagClassName "nam") (TagClassName "rol") tags
+    personName = toUtfString $ getTextFromTags block
+    personRole = toUtfString $ getTextFromTags $ dropWhile (not . (isClassInTag (TagClassName "rol"))) tags
     (personRef, needSave) = if L.any (~== "<a>") block
                 then ((urlToStr mainUrl)
                       ++ (fromAttrib "href" $ LBS.unpack <$> (head $ dropWhile (~/= "<a>") block)), True)
@@ -111,17 +123,16 @@ getInfoUrl block = URL $ (urlToStr mainUrl) ++
 
 parseOneBlock :: Int -> Int -> [Tag LBS.ByteString] -> IO Concert
 parseOneBlock m y block = do
-  let filarmoni = LBS.pack "Philharmonia"
-  let oneDate = parseDate m y block
-  let onePrice = parsePrice block
-  let infoUrl = getInfoUrl block
+  let onePrice  = parsePrice block
+  let oneDate   = parseDate m y block
+  let infoUrl   = getInfoUrl block
   infos <- getHtml infoUrl
   let allInfo = (parseInfoTags . parseTags) infos
-  let concert = Concert { concertDate = oneDate
-                        , concertPrice = onePrice
-                        , concertInfo = allInfo
-                        , concertPlace = filarmoni
-                        , urlAbout = infoUrl
+  let concert = Concert { concertDate   = oneDate
+                        , concertPrice  = onePrice
+                        , concertInfo   = allInfo
+                        , concertPlace  = "Филармония"
+                        , urlAbout      = infoUrl
                         }
   return concert
 
@@ -132,6 +143,6 @@ parseFun :: Int -> Int -> IO [Concert]
 parseFun m y = do
   body <- getHtml (makeUrl m y)
   let blocks = parseAfishaList body
-  concerts <- mapM (parseOneBlock m y) $ take 10 blocks
+  concerts <- mapM (parseOneBlock m y) blocks
   return concerts
 

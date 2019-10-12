@@ -31,33 +31,32 @@ build-type:     Simple
 library
   hs-source-dirs:   src
   exposed-modules:  Common
-                    , Parser1
-                    , Parser2
+                  , Database
+--                  , Parser1
+--                  , Parser2
   ghc-options:      -Wall
---                    -Werror
-  build-depends:    base >=4.7 && < 5
-                    , bytestring
-                    , containers
-                --  ,     encoding
-                    , tagsoup
-                --  ,     text-icu
-                    , text
-                --  ,     time, directory, process
-                --  ,     network
-                    , HTTP
-                    , http-client-tls
-                    , http-types
-                    , http-client
-                    , http-conduit
-                    , html-conduit
---                  ,   html-charset
-                    , xml-conduit
-  default-language: Haskell2010
+  build-depends:    base
+                  , bytestring
+                  , http-client-tls
+                  , http-client
+                  , tagsoup
+                  , text
+                  , postgresql-simple
+                  , utf8-string
+--                    , http-conduit
+--                    , text-icu
+--                    , containers
+--                    , encoding
+--                    , html-conduit
+--                    , html-charset
+--                    , HTTP
+--                    , http-types
+  default-extensions:  OverloadedStrings
+                     , NoMonomorphismRestriction
+  default-language:    Haskell2010
 
 executable concert-afisha
-  main-is: Main.hs
---  other-modules:
---      Paths_concert_afisha
+  main-is:              Main.hs
   hs-source-dirs:       app
   ghc-options:          -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:        base >=4.7 && <5,
