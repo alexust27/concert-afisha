@@ -1,0 +1,79 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 45b77004862b9632e511b5db7a2e2b9bf810ba9b10a97d3b1160a333dab46b6b
+
+name:           concert-afisha
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/alexust27/concert-afisha#readme>
+homepage:       https://github.com/alexust27/concert-afisha#readme
+bug-reports:    https://github.com/alexust27/concert-afisha/issues
+author:         Aleksandr Ustinov
+maintainer:     ustinov1998s@gmail.com
+copyright:      2019 Aleksandr Ustinov
+
+license:        BSD3
+license-file:   LICENSE
+category:       Web
+build-type:     Simple
+
+--extra-source-files:
+--    README.md
+--    ChangeLog.md
+
+--source-repository head
+--  type: git
+--  location: https://github.com/alexust27/concert-afisha
+
+library
+  hs-source-dirs:   src
+  exposed-modules:  Common
+                    , Parser1
+                    , Parser2
+  ghc-options:      -Wall
+--                    -Werror
+  build-depends:    base >=4.7 && < 5
+                    , bytestring
+                    , containers
+                --  ,     encoding
+                    , tagsoup
+                --  ,     text-icu
+                    , text
+                --  ,     time, directory, process
+                --  ,     network
+                    , HTTP
+                    , http-client-tls
+                    , http-types
+                    , http-client
+                    , http-conduit
+                    , html-conduit
+--                  ,   html-charset
+                    , xml-conduit
+  default-language: Haskell2010
+
+executable concert-afisha
+  main-is: Main.hs
+--  other-modules:
+--      Paths_concert_afisha
+  hs-source-dirs:       app
+  ghc-options:          -Werror -threaded -rtsopts -with-rtsopts=-N
+  build-depends:        base >=4.7 && <5,
+                        bytestring,
+                        concert-afisha
+  default-language:     Haskell2010
+
+--test-suite concert-afisha-test
+--  type: exitcode-stdio-1.0
+--  main-is: Spec.hs
+--  other-modules:
+--      Paths_concert_afisha
+--  hs-source-dirs:
+--      test
+--  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+--  build-depends:
+--      base >=4.7 && <5
+--    , concert-afisha
+--  default-language: Haskell2010
