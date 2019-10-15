@@ -80,15 +80,15 @@ parseInfoTags tags = Info { title     = mainTitle
 
 parsePeople :: [Tag LBS.ByteString] -> Maybe Person
 parsePeople tags = if needSave then
-                   Just Person { name = personName
-                               , role = personRole
-                               , personId = personRef
+                   Just Person { personName = pName
+                               , personRole = Just pRole
+                               , personId   = personRef
                                }
                    else Nothing
   where
-    block      = fromTagToTag (TagClassName "nam") (TagClassName "rol") tags
-    personName = toUtfString $ getTextFromTags block
-    personRole = toUtfString $ getTextFromTags $ dropWhile (not . (isClassInTag (TagClassName "rol"))) tags
+    block = fromTagToTag (TagClassName "nam") (TagClassName "rol") tags
+    pName = toUtfString $ getTextFromTags block
+    pRole = toUtfString $ getTextFromTags $ take 3 $ dropWhile (not . (isClassInTag (TagClassName "rol"))) tags
     (personRef, needSave) = if L.any (~== "<a>") block
                 then ((urlToStr mainUrl)
                       ++ (fromAttrib "href" $ LBS.unpack <$> (head $ dropWhile (~/= "<a>") block)), True)
@@ -143,6 +143,6 @@ parseFun :: Int -> Int -> IO [Concert]
 parseFun m y = do
   body <- getHtml (makeUrl m y)
   let blocks = parseAfishaList body
-  concerts <- mapM (parseOneBlock m y) blocks
+  concerts <- mapM (parseOneBlock m y) $ take 8 $ drop 5 blocks
   return concerts
 

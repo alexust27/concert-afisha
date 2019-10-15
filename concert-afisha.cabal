@@ -32,8 +32,8 @@ library
   hs-source-dirs:   src
   exposed-modules:  Common
                   , Database
---                  , Parser1
---                  , Parser2
+                  , Parser1
+                  , Parser2
   ghc-options:      -Wall
   build-depends:    base
                   , bytestring
@@ -41,6 +41,7 @@ library
                   , http-client
                   , tagsoup
                   , text
+                  , time
                   , postgresql-simple
                   , utf8-string
 --                    , http-conduit
@@ -51,8 +52,8 @@ library
 --                    , html-charset
 --                    , HTTP
 --                    , http-types
-  default-extensions:  OverloadedStrings
-                     , NoMonomorphismRestriction
+--  default-extensions:  OverloadedStrings
+--                     , NoMonomorphismRestriction
   default-language:    Haskell2010
 
 executable concert-afisha

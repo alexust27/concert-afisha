@@ -13,6 +13,7 @@ module Common
 , getIntFromTag
 , getOneElemFromTags
 , getTextFromTags
+, getTimeAndDate
 , printConcert
 , strToPrice
 , urlToStr
@@ -41,8 +42,8 @@ data Price = Price ( [Int]
                    , URL
                    ) deriving (Eq, Show)
 
-data Person = Person { name       :: String
-                     , role       :: String
+data Person = Person { personName       :: String
+                     , personRole       :: Maybe String
                      , personId   :: String
                      } deriving (Show, Eq)
 
@@ -63,6 +64,10 @@ data Concert = Concert { concertDate    :: Date
 -- months = [1..12] :: [Int]
 -- years = [2019..] :: [Int]
 
+getTimeAndDate :: Date -> (String, String)
+getTimeAndDate d = (time d, dat)
+  where
+    dat = show (day d) ++ "-" ++ show (month d) ++ "-" ++ show (year d)
 
 urlToStr :: URL -> String
 urlToStr (URL str) = str
@@ -122,7 +127,11 @@ printConcert concert = do
     Just pr -> print pr
   (putStrLn . concertPlace) concert
   let people = (persons . concertInfo) concert
-  mapM_ (putStrLn . name) people
+  mapM_ (putStrLn . personName) people
+  let rr pr = case personRole pr of
+                Just x -> x
+                Nothing -> ""
+  mapM_ (putStrLn . rr) people
   mapM_ (print . personId) people
 
   (putStrLn . moreInfo . concertInfo) concert

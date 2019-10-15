@@ -10,17 +10,23 @@ module Main where
 --     hSetEncoding out te
 
 
-import Common (URL(..), Concert(..), Info(..), Person(..), printConcert)
+import Common (printConcert)
 import Parser1 (parseFun)
 import Parser2 (parseFun2)
-import Database
+import Database (addConcertToDB, createTables, dropTables)
 
 main :: IO ()
 main = do
---   r <- doSome
---   print r
-    let (m, y) = (11, 2019)
-    concerts <- parseFun m y
-    concerts2 <- parseFun2 m y
-    mapM_ printConcert concerts
-    mapM_ printConcert concerts2
+--   dropTables
+--   createTables
+  let (m, y) = (11, 2019)
+--   concerts <- parseFun m y
+--   mapM_ printConcert concerts
+--   mapM_ addConcertToDB concerts
+
+
+--   res <- isConcertInDB $ (concerts !! 1)
+--   print res
+  concerts2 <- parseFun2 m y
+  mapM_ printConcert concerts2
+  mapM_ addConcertToDB concerts2

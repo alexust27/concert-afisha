@@ -90,13 +90,13 @@ parseInfoTags tags = Info { title     = [mainTitle, addTitle]
 parsePeople :: [Tag LBS.ByteString] -> Maybe Person
 parsePeople tags = if L.length maybePerson > 2
                    then Nothing
-                   else Just $ Person { name     = personName
-                                      , role     = "undefined"
-                                      , personId = personRef
+                   else Just $ Person { personName     = pName
+                                      , personRole     = Nothing
+                                      , personId       = personRef
                                       }
                    where
                      maybePerson = LBS.words $ getTextFromTags $ take 3 tags
-                     personName = toString $ LBS.unwords maybePerson
+                     pName = toString $ LBS.unwords maybePerson
                      personRef = (urlToStr mainUrl) ++ (fromAttrib "href" $ LBS.unpack <$> (head tags))
 
 
@@ -144,7 +144,7 @@ parseFun2 :: Int -> Int -> IO ([Concert])
 parseFun2 m y = do
   body <- getHtml (makeUrl m y)
   let bigBlocks = parseAfishaList body
-  res <- mapM parseBigBlock bigBlocks
+  res <- mapM parseBigBlock $ take 1 bigBlocks
   return $ L.concat res
 
 
