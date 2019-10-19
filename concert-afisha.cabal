@@ -34,9 +34,11 @@ library
                   , Database
                   , Parser1
                   , Parser2
+                  , UI
   ghc-options:      -Wall
   build-depends:    base
                   , bytestring
+                  , gtk3
                   , http-client-tls
                   , http-client
                   , tagsoup
@@ -54,6 +56,7 @@ library
 --                    , http-types
 --  default-extensions:  OverloadedStrings
 --                     , NoMonomorphismRestriction
+  extra-libraries:   gmodule-2.0
   default-language:    Haskell2010
 
 executable concert-afisha
@@ -64,6 +67,14 @@ executable concert-afisha
                         bytestring,
                         concert-afisha
   default-language:     Haskell2010
+
+--executable afisha
+--  main-is:              UI.hs
+--  hs-source-dirs:       app
+--  ghc-options:          -Werror -threaded -rtsopts -with-rtsopts=-N
+--  build-depends:        base
+--                      , bytestring
+--  default-language:     Haskell2010
 
 --test-suite concert-afisha-test
 --  type: exitcode-stdio-1.0

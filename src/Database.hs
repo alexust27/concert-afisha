@@ -198,3 +198,6 @@ dropTables = do
   |]
 
   void $ execute_ conn qDrop
+
+
+-- getByPrice :: Int -> Int

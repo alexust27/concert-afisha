@@ -1,0 +1,1120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.18.3 -->
+<interface>
+  <requires lib="gtk+" version="3.12"/>
+  <object class="GtkWindow" id="main_window">
+    <property name="width_request">800</property>
+    <property name="height_request">600</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">10</property>
+    <property name="title" translatable="yes">афиша</property>
+    <property name="modal">True</property>
+    <child>
+      <object class="GtkBox" id="box1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="margin_top">1</property>
+        <property name="margin_bottom">1</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">АФИША</property>
+            <property name="ellipsize">middle</property>
+            <property name="width_chars">6</property>
+            <property name="max_width_chars">7</property>
+            <attributes>
+              <attribute name="font-desc" value="&lt;Enter Value&gt; 12"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkPaned" id="paned1">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="margin_top">1</property>
+            <child>
+              <object class="GtkSearchEntry" id="search_entry">
+                <property name="name">search</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="margin_left">200</property>
+                <property name="margin_right">7</property>
+                <property name="margin_top">3</property>
+                <property name="margin_bottom">3</property>
+                <property name="primary_icon_name">edit-find-symbolic</property>
+                <property name="primary_icon_activatable">False</property>
+                <property name="primary_icon_sensitive">False</property>
+              </object>
+              <packing>
+                <property name="resize">False</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="search_button">
+                <property name="label" translatable="yes">поиск</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="halign">start</property>
+                <property name="margin_left">7</property>
+                <property name="margin_right">5</property>
+                <property name="margin_top">3</property>
+                <property name="margin_bottom">3</property>
+                <signal name="clicked" handler="on_button1_clicked" object="search_entry" swapped="no"/>
+                <signal name="enter" handler="on_button1_enter" object="search_entry" swapped="no"/>
+              </object>
+              <packing>
+                <property name="resize">False</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkPaned" id="paned2">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <child>
+              <object class="GtkBox" id="left_menu">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_left">5</property>
+                <property name="margin_right">2</property>
+                <property name="margin_top">2</property>
+                <property name="margin_bottom">2</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="label2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">2</property>
+                    <property name="margin_right">2</property>
+                    <property name="margin_top">2</property>
+                    <property name="margin_bottom">2</property>
+                    <property name="label" translatable="yes">выбирите дату</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkCalendar" id="calendar1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="year">2019</property>
+                    <property name="month">9</property>
+                    <property name="day">16</property>
+                    <property name="show_day_names">False</property>
+                    <property name="show_details">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="box_price">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">3</property>
+                    <property name="margin_right">2</property>
+                    <property name="margin_top">4</property>
+                    <property name="margin_bottom">3</property>
+                    <property name="spacing">2</property>
+                    <property name="baseline_position">top</property>
+                    <child>
+                      <object class="GtkLabel" id="label3">
+                        <property name="name">price</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="label" translatable="yes">Цена</property>
+                        <property name="width_chars">5</property>
+                        <property name="single_line_mode">True</property>
+                        <property name="max_width_chars">5</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">5</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="min_price_entry">
+                        <property name="name">min_price</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="margin_right">3</property>
+                        <property name="margin_top">1</property>
+                        <property name="margin_bottom">1</property>
+                        <property name="max_length">6</property>
+                        <property name="width_chars">6</property>
+                        <property name="max_width_chars">5</property>
+                        <property name="caps_lock_warning">False</property>
+                        <property name="placeholder_text" translatable="yes">от</property>
+                        <property name="input_purpose">digits</property>
+                        <property name="input_hints">GTK_INPUT_HINT_SPELLCHECK | GTK_INPUT_HINT_NONE</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="max_price_entry">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="halign">center</property>
+                        <property name="margin_left">3</property>
+                        <property name="max_length">6</property>
+                        <property name="width_chars">6</property>
+                        <property name="max_width_chars">6</property>
+                        <property name="caps_lock_warning">False</property>
+                        <property name="placeholder_text" translatable="yes">до</property>
+                        <property name="input_purpose">digits</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="padding">3</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox" id="box4">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <property name="baseline_position">bottom</property>
+                    <child>
+                      <object class="GtkButton" id="update_button">
+                        <property name="label" translatable="yes">update database</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="halign">center</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="image_position">bottom</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="padding">2</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">False</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="resize">False</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="scrolledwindow1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="margin_top">4</property>
+                <property name="hscrollbar_policy">never</property>
+                <property name="vscrollbar_policy">always</property>
+                <property name="shadow_type">in</property>
+                <property name="min_content_height">500</property>
+                <property name="overlay_scrolling">False</property>
+                <child>
+                  <object class="GtkViewport" id="viewport1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkBox" id="box_view">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkLabel" id="label0">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_top">2</property>
+                            <property name="margin_bottom">2</property>
+                            <property name="label" translatable="yes">Результаты поиска:</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">2</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSeparator" id="separator1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_top">1</property>
+                            <property name="margin_bottom">1</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkListBox" id="listbox1">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="margin_left">1</property>
+                            <property name="margin_top">5</property>
+                            <property name="margin_bottom">8</property>
+                            <property name="selection_mode">none</property>
+                            <property name="activate_on_single_click">False</property>
+                            <child>
+                              <object class="GtkListBoxRow" id="listboxrow1">
+                                <property name="width_request">100</property>
+                                <property name="height_request">80</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="margin_left">2</property>
+                                <property name="margin_right">2</property>
+                                <property name="margin_top">2</property>
+                                <property name="margin_bottom">2</property>
+                                <property name="activatable">False</property>
+                                <property name="selectable">False</property>
+                                <child>
+                                  <object class="GtkBox" id="main_block1">
+                                    <property name="width_request">100</property>
+                                    <property name="height_request">80</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <child>
+                                      <object class="GtkBox" id="box2">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkLabel" id="label_time1">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="xpad">2</property>
+                                            <property name="ypad">2</property>
+                                            <property name="label" translatable="yes">12-20</property>
+                                            <property name="width_chars">7</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 12"/>
+                                              <attribute name="weight" value="bold"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="label_date1">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="xpad">2</property>
+                                            <property name="ypad">2</property>
+                                            <property name="label" translatable="yes">21-09-2019</property>
+                                            <property name="width_chars">7</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 10"/>
+                                              <attribute name="weight" value="bold"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="padding">2</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox" id="box3">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkBox" id="box7">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkLabel" id="label_name1">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin_bottom">3</property>
+                                                <property name="label" translatable="yes">Название концерта</property>
+                                                <attributes>
+                                                  <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                                  <attribute name="style" value="oblique"/>
+                                                  <attribute name="weight" value="semibold"/>
+                                                  <attribute name="foreground" value="#000000000000"/>
+                                                </attributes>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="label_place1">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin_bottom">2</property>
+                                                <property name="label" translatable="yes">место концерта</property>
+                                                <property name="justify">right</property>
+                                                <property name="angle">0.01</property>
+                                                <attributes>
+                                                  <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                                  <attribute name="weight" value="book"/>
+                                                </attributes>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="padding">2</property>
+                                                <property name="pack_type">end</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="label_add_info1">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">2</property>
+                                            <property name="margin_bottom">2</property>
+                                            <property name="label" translatable="yes">какая либо дополнительная информация вфыв фы вфыв фы вфыв фыв фыв фвффввввввввввв</property>
+                                            <property name="wrap">True</property>
+                                            <attributes>
+                                              <attribute name="style" value="italic"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox" id="box10">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="orientation">vertical</property>
+                                            <child>
+                                              <object class="GtkExpander" id="expander1">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="margin_top">2</property>
+                                                <property name="margin_bottom">2</property>
+                                                <child>
+                                                  <object class="GtkBox" id="box_persons1">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <child>
+                                                      <object class="GtkLabel" id="label_persons1">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="label" translatable="yes">label</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="expand">True</property>
+                                                        <property name="fill">True</property>
+                                                        <property name="position">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <placeholder/>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child type="label">
+                                                  <object class="GtkLabel" id="label6">
+                                                    <property name="width_request">60</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="margin_bottom">2</property>
+                                                    <property name="label" translatable="yes">Участники</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkExpander" id="expander3">
+                                                <property name="width_request">339</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="margin_top">2</property>
+                                                <property name="margin_bottom">2</property>
+                                                <child>
+                                                  <object class="GtkBox" id="box_info1">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="orientation">vertical</property>
+                                                    <child>
+                                                      <object class="GtkTextView" id="textview_info1">
+                                                        <property name="width_request">200</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="pixels_above_lines">2</property>
+                                                        <property name="pixels_below_lines">2</property>
+                                                        <property name="wrap_mode">word</property>
+                                                        <property name="left_margin">2</property>
+                                                        <property name="right_margin">2</property>
+                                                        <property name="top_margin">2</property>
+                                                        <property name="bottom_margin">3</property>
+                                                        <property name="buffer">textbuffer_info1</property>
+                                                        <property name="monospace">True</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="expand">False</property>
+                                                        <property name="fill">True</property>
+                                                        <property name="position">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <placeholder/>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child type="label">
+                                                  <object class="GtkLabel" id="label7">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="margin_bottom">2</property>
+                                                    <property name="label" translatable="yes">Подробнее</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">True</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="padding">3</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox" id="price_box1">
+                                        <property name="width_request">80</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkLabel" id="label_price1">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">2</property>
+                                            <property name="margin_bottom">2</property>
+                                            <property name="label" translatable="yes">Цена:</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="padding">2</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="label_price2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">2</property>
+                                            <property name="margin_bottom">2</property>
+                                            <property name="label" translatable="yes">400 - 800 р</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="padding">2</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLinkButton" id="linkbutton_buy1">
+                                            <property name="label" translatable="yes">Купить</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="uri">http://glade.gnome.org</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLinkButton" id="linkbutton_site1">
+                                            <property name="label" translatable="yes">На сайт</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="uri">http://glade.gnome.org</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">3</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkListBoxRow" id="listboxrow2">
+                                <property name="width_request">100</property>
+                                <property name="height_request">80</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="activatable">False</property>
+                                <property name="selectable">False</property>
+                                <child>
+                                  <object class="GtkBox" id="main_block2">
+                                    <property name="width_request">100</property>
+                                    <property name="height_request">80</property>
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="margin_left">2</property>
+                                    <property name="margin_right">2</property>
+                                    <property name="margin_top">2</property>
+                                    <property name="margin_bottom">2</property>
+                                    <child>
+                                      <object class="GtkBox" id="box5">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkLabel" id="label_time2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="xpad">2</property>
+                                            <property name="ypad">2</property>
+                                            <property name="label" translatable="yes">12-20</property>
+                                            <property name="width_chars">7</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 12"/>
+                                              <attribute name="weight" value="bold"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="label_date2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="xpad">2</property>
+                                            <property name="ypad">2</property>
+                                            <property name="label" translatable="yes">21-09-2019</property>
+                                            <property name="width_chars">7</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 10"/>
+                                              <attribute name="weight" value="bold"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="padding">2</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox" id="box6">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkBox" id="box8">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <child>
+                                              <object class="GtkLabel" id="label_name2">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin_bottom">3</property>
+                                                <property name="label" translatable="yes">Название концерта</property>
+                                                <attributes>
+                                                  <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                                  <attribute name="style" value="oblique"/>
+                                                  <attribute name="weight" value="semibold"/>
+                                                  <attribute name="foreground" value="#000000000000"/>
+                                                </attributes>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="label_place2">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">False</property>
+                                                <property name="margin_bottom">2</property>
+                                                <property name="label" translatable="yes">место концерта</property>
+                                                <property name="justify">right</property>
+                                                <property name="angle">0.01</property>
+                                                <attributes>
+                                                  <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                                  <attribute name="weight" value="book"/>
+                                                </attributes>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="padding">2</property>
+                                                <property name="pack_type">end</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="label_add_info2">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">2</property>
+                                            <property name="margin_bottom">2</property>
+                                            <property name="label" translatable="yes">какая либо дополнительная информация вфыв фы вфыв фы вфыв фыв фыв фвффввввввввввв</property>
+                                            <property name="wrap">True</property>
+                                            <attributes>
+                                              <attribute name="style" value="italic"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkBox" id="box9">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="orientation">vertical</property>
+                                            <child>
+                                              <object class="GtkExpander" id="expander2">
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="margin_top">2</property>
+                                                <property name="margin_bottom">2</property>
+                                                <child>
+                                                  <object class="GtkBox" id="box_persons2">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <child>
+                                                      <object class="GtkLabel" id="label_persons2">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">False</property>
+                                                        <property name="label" translatable="yes">label</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="expand">True</property>
+                                                        <property name="fill">True</property>
+                                                        <property name="position">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <placeholder/>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child type="label">
+                                                  <object class="GtkLabel" id="label4">
+                                                    <property name="width_request">60</property>
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="margin_bottom">2</property>
+                                                    <property name="label" translatable="yes">Участники</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkExpander" id="expander4">
+                                                <property name="width_request">339</property>
+                                                <property name="visible">True</property>
+                                                <property name="can_focus">True</property>
+                                                <property name="margin_top">2</property>
+                                                <property name="margin_bottom">2</property>
+                                                <child>
+                                                  <object class="GtkBox" id="box_info2">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="orientation">vertical</property>
+                                                    <child>
+                                                      <object class="GtkTextView" id="textview_info2">
+                                                        <property name="width_request">200</property>
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="pixels_above_lines">2</property>
+                                                        <property name="pixels_below_lines">2</property>
+                                                        <property name="wrap_mode">word</property>
+                                                        <property name="left_margin">2</property>
+                                                        <property name="right_margin">2</property>
+                                                        <property name="top_margin">2</property>
+                                                        <property name="bottom_margin">3</property>
+                                                        <property name="buffer">textbuffer_info1</property>
+                                                        <property name="monospace">True</property>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="expand">False</property>
+                                                        <property name="fill">True</property>
+                                                        <property name="position">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <placeholder/>
+                                                    </child>
+                                                  </object>
+                                                </child>
+                                                <child type="label">
+                                                  <object class="GtkLabel" id="label5">
+                                                    <property name="visible">True</property>
+                                                    <property name="can_focus">False</property>
+                                                    <property name="margin_bottom">2</property>
+                                                    <property name="label" translatable="yes">Подробнее</property>
+                                                  </object>
+                                                </child>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">True</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="padding">3</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox" id="price_box2">
+                                        <property name="width_request">80</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkLabel" id="label_price3">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">2</property>
+                                            <property name="margin_bottom">2</property>
+                                            <property name="label" translatable="yes">Цена:</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="padding">2</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel" id="label_price4">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">False</property>
+                                            <property name="margin_top">2</property>
+                                            <property name="margin_bottom">2</property>
+                                            <property name="label" translatable="yes">400 - 800 р</property>
+                                            <attributes>
+                                              <attribute name="font-desc" value="&lt;Enter Value&gt; 11"/>
+                                            </attributes>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="padding">2</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLinkButton" id="linkbutton_buy2">
+                                            <property name="label" translatable="yes">Купить</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="uri">http://glade.gnome.org</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLinkButton" id="linkbutton_site2">
+                                            <property name="label" translatable="yes">На сайт</property>
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="receives_default">True</property>
+                                            <property name="relief">none</property>
+                                            <property name="uri">http://glade.gnome.org</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">3</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">1</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info1">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info10">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info11">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info12">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info2">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info3">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info4">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info5">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info6">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info7">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info8">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+  <object class="GtkTextBuffer" id="textbuffer_info9">
+    <property name="text" translatable="yes">В программе камерного оркестра «Дивертисмент»  два популярнейших сочинения, два взгляда на вечную тему  из разных эпох, частей света и культур. Известность скрипичных концертов «Времена года» Вивальди, еще при жизни автора стремительно распространившегося по Европе, била все рекорды. В его тени и для потомков, и для современников значительно померкли остальные сочинения композитора  около 600 концертов и 50 опер (впрочем, сам Вивальди утверждал, что опер было 94). На страницах этих партитур в неустанном виртуозном соревновании солиста и оркестра автор, в том числе используя звукоподражательные приемы, воссоздает картины природы, а предпосланные каждому концерту сонеты подробно объясняют пытливому слушателю, какие события разворачиваются в конкретных тактах. «Времена года» Пьяццоллы  человечные, жаркие, их объединяет страсть танго. В чередовании пьес перед слушателем сменяются не только времена года, но и вписанные в них события из жизни бедняков с окраин Буэнос-Айреса: холод и одиночество, первая любовь, страсть, пикник в парке, возрождение после зимы. Свободную и остроумную транскрипцию этой музыки для струнного оркестра сделал Леонид Десятников: добавил в каждую часть несколько цитат из концертов-прародителей Вивальди, при этом учел разницу времен года в северном и южном полушариях: когда в южном, у Пьяццоллы, бушует «Лето», в северном, у Вивальди, господствует «Зима». Камерный оркестр «Дивертисмент» Илья Иофф художественный руководитель и солист (скрипка) Вивальди «Времена года», четыре концерта для скрипки и струнных Пьяццолла - Десятников «Времена года в Буэнос-Айресе», четыре танго для скрипки и струнного оркестра</property>
+  </object>
+</interface>

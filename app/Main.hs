@@ -14,12 +14,14 @@ import Common (printConcert)
 import Parser1 (parseFun)
 import Parser2 (parseFun2)
 import Database (addConcertToDB, createTables, dropTables)
+import UI
 
 main :: IO ()
 main = do
+  gui
 --   dropTables
 --   createTables
-  let (m, y) = (11, 2019)
+--   let (m, y) = (11, 2019)
 --   concerts <- parseFun m y
 --   mapM_ printConcert concerts
 --   mapM_ addConcertToDB concerts
@@ -27,6 +29,6 @@ main = do
 
 --   res <- isConcertInDB $ (concerts !! 1)
 --   print res
-  concerts2 <- parseFun2 m y
-  mapM_ printConcert concerts2
-  mapM_ addConcertToDB concerts2
+--   concerts2 <- parseFun2 m y
+--   mapM_ printConcert concerts2
+--   mapM_ addConcertToDB concerts2
