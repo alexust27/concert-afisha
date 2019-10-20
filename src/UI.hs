@@ -1,28 +1,64 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module UI where
 
-import Control.Monad
-import Control.Monad.IO.Class
-import Data.IORef
+import Control.Monad(void)
+-- import Control.Monad.IO.Class
+-- import Data.IORef
 import Graphics.UI.Gtk
 -- import Graphics.UI.Gtk.Glade
-import Graphics.UI.Gtk.Builder
+import Graphics.UI.Gtk.Builder(builderGetObject)
 import Data.Char(isDigit)
 import Database(getConcertsFromDB)
-import Common (Concert(..), Info(..), Person(..),Price(..), Date(..), URL(..), getTimeAndDate, urlToStr)
+import Common (Concert(..), Info(..), Person(..), Price(..), getTimeAndDate, urlToStr)
 
-hello :: (ButtonClass o) => o -> IO ()
-hello b = set b [buttonLabel := "Hello World"]
+-- hello :: (ButtonClass o) => o -> IO ()
+-- hello b = set b [buttonLabel := "Hello World"]
 
 concertToBox :: Concert -> IO Box
 concertToBox concert = do
   builder2 <- builderNew
   builderAddFromFile builder2 "oneBlock.glade"
   concertBox      <- builderGetObject builder2 castToBox "one_concert_box"
+  timeLabel       <- builderGetObject builder2 castToLabel "label_time"
+  dateLabel       <- builderGetObject builder2 castToLabel "label_date"
+  nameLabel       <- builderGetObject builder2 castToLabel "label_name"
+  placeLabel      <- builderGetObject builder2 castToLabel "label_place"
+  addInfoLabel    <- builderGetObject builder2 castToLabel "label_add_info"
+  priceLabel      <- builderGetObject builder2 castToLabel "label_price"
+  buttonBuy       <- builderGetObject builder2 castToLinkButton "linkbutton_buy"
+  buttonAbout     <- builderGetObject builder2 castToLinkButton "linkbutton_about"
   infoTextBuffer  <- builderGetObject builder2 castToTextBuffer "textbuffer_info"
 
-
+--   labelSetText Label str
 --   textBufferSetText infoTextBuffer txtt
+
+  let infoC = concertInfo concert
+  labelSetText nameLabel (title infoC)
+  let cDate = concertDate concert
+  let (strTime, strDate) = getTimeAndDate cDate
+  labelSetText dateLabel strDate
+  labelSetText timeLabel $ take 5 strTime
+  let priceToStr p1 p2 = (if p1 == p2 then show p1 else (show p1) ++ "-" ++ (show p2) ) ++ " р."
+  let (prices, urlBuy) = case concertPrice concert of
+                          Nothing -> ("Билетов нет", "")
+                          Just (Price((p1, p2), url)) -> (priceToStr p1 p2, urlToStr url)
+  labelSetText priceLabel prices
+
+  labelSetText placeLabel $ concertPlace concert
+  labelSetText addInfoLabel $ addInfo infoC
+  textBufferSetText infoTextBuffer $ moreInfo infoC
+
+  set buttonAbout [linkButtonURI := (urlToStr $ urlAbout concert) ]
+  set buttonBuy   [linkButtonURI := urlBuy ]
+
+--   let people = persons infoC
+--   mapM_ (putStrLn . personName) people
+--   let rr pr = case personRole pr of
+--                 Just x -> x
+--                 Nothing -> ""
+--   mapM_ (putStrLn . rr) people
+--   mapM_ (print . personId) people
+
 
   return concertBox
 
@@ -47,29 +83,26 @@ gui = do
   containerRemove window2 mainBox
   containerAdd window mainBox
 
-  searchButton `on` buttonActivated $ do
+  void $ searchButton `on` buttonActivated $ do
     searchText <- entryGetText searchEntry
-    if null searchText then return ()
-    else do
-      putStrLn searchText
-      entrySetText searchEntry ""
-      cDate <- calendarGetDate calendar
+    childsBox <- containerGetChildren veiwBox
+    mapM_ (containerRemove veiwBox) childsBox
+    putStrLn searchText
+    entrySetText searchEntry ""
+    cDate <- calendarGetDate calendar
 --       (cYear, cMonth, cDay) <- calendarGetDate calendar
-      minPrice   <- entryGetText minPriceEntry
-      maxPrice   <- entryGetText maxPriceEntry
-      let minPr :: Int = if null minPrice || not (all isDigit minPrice) then -1 else read minPrice
-      let maxPr :: Int = if null maxPrice || not (all isDigit maxPrice) then -1 else read maxPrice
+    minPrice   <- entryGetText minPriceEntry
+    maxPrice   <- entryGetText maxPriceEntry
+    let minPr :: Int = if null minPrice || not (all isDigit minPrice) then -1 else read minPrice
+    let maxPr :: Int = if null maxPrice || not (all isDigit maxPrice) then -1 else read maxPrice
+    concerts <- getConcertsFromDB searchText minPr maxPr cDate
+    addedBlocks <- mapM concertToBox concerts
+    mapM_ (containerAdd veiwBox) addedBlocks
 
---       getConcertFromDB searchText minPr minPr
-      concerts <- getConcertsFromDB searchText minPr maxPr cDate
-
-      addedBlocks <- mapM concertToBox concerts
---       mainL <- labelNew $ Just "searchText"
---       labelSetLabel mainL "Цена\n 800-900 р."
-      mapM_ (containerAdd veiwBox) addedBlocks
+  void $ searchButton `on` buttonActivated $ do
 
   widgetShowAll window
-  on window objectDestroy mainQuit
+  void $ on window objectDestroy mainQuit
   mainGUI
 
 

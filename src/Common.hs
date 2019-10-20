@@ -22,7 +22,7 @@ module Common
 import Network.HTTP.Client (httpLbs, newManager, parseRequest, responseBody)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import Text.HTML.TagSoup (Tag, Tag ( TagOpen ), isTagText, fromAttrib, fromTagText)
-import Data.Char(isDigit)
+import Data.Char(isDigit, chr)
 import qualified Data.Text as T
 import qualified Data.List as L
 import qualified Data.ByteString.Lazy.Char8 as LBS
@@ -36,7 +36,7 @@ data Date = Date { day    :: Int
                  , time   :: String
                  } deriving (Eq, Show)
 
-data Price = Price ( [Int]
+data Price = Price ( (Int, Int)
                    , URL
                    ) deriving (Eq, Show)
 
@@ -83,27 +83,31 @@ fromTagToTag :: TagClassName -> TagClassName -> [Tag LBS.ByteString] -> [Tag LBS
 fromTagToTag start end tags = takeWhile (not . (isClassInTag end))
                             $ tail $ dropWhile (not . (isClassInTag start)) tags
 
+-- возвращает текст из блока тегов
 getTextFromTags :: (LBS.ByteString -> String) -> [Tag LBS.ByteString] -> String
-getTextFromTags toStrFun tags = delSpaces $ map (toStrFun . fromTagText) $ filter isTagText tags
+getTextFromTags toStrFun tags = delSpaces $ map (changeSim . toStrFun . fromTagText) $ filter isTagText tags
   where
     delSpaces = L.unwords . L.words . L.unwords
+    changeSim = (map (\x -> if x == chr 65533 then ' ' else x))
 
 
+-- возвращает первый текст после тега с данным классом
 getFirstTextFromTag :: (LBS.ByteString -> String) -> [Tag LBS.ByteString] -> TagClassName -> String
-getFirstTextFromTag toStrF block className =  if L.null res then "" else toStrF $ fromTagText $ head res
+getFirstTextFromTag toStrF block className =  if L.null res then "" else toNormalText $ head res
   where
     res = dropWhile (not . isTagText) $ dropWhile (not . (isClassInTag className)) block
+    toNormalText = L.unwords . L.words . toStrF . fromTagText
 
-
-strToPrice :: String -> [Int]
-strToPrice str = [mnPrice, max mxPrice mnPrice]
+-- берет превые два числа из строки
+strToPrice :: String -> (Int, Int)
+strToPrice str = (mnPrice, max mxPrice mnPrice)
   where
     clearStr = L.unwords . L.words $ str
     mnPrice = toIntPr $ takeWhile (isDigit) clearStr
     mxPrice = toIntPr $ takeWhile (isDigit) $ dropWhile (not . isDigit) $ dropWhile (isDigit) clearStr
     toIntPr :: String -> Int
     toIntPr pr = case pr of
-        [] -> (-1)
+        "" -> (-1)
         _ -> read pr
 
 getHtml :: URL -> IO (LBS.ByteString)
@@ -116,21 +120,30 @@ getHtml (URL url) = do
 
 printConcert :: Concert -> IO()
 printConcert concert = do
-  (putStrLn . title . concertInfo) concert
+
+  let infoC = concertInfo concert
+  (putStrLn . title) infoC
   (print . concertDate) concert
+  putStrLn "Билеты:"
   case concertPrice concert of
     Nothing -> putStrLn "No tickects"
     Just pr -> print pr
+  putStrLn "Место:"
   (putStrLn . concertPlace) concert
-  let people = (persons . concertInfo) concert
+  putStrLn "Люди:"
+  let people = persons infoC
   mapM_ (putStrLn . personName) people
   let rr pr = case personRole pr of
                 Just x -> x
                 Nothing -> ""
+  putStrLn "Роли:"
   mapM_ (putStrLn . rr) people
+  putStrLn "ссылки на людей:"
   mapM_ (print . personId) people
-
-  (putStrLn . moreInfo . concertInfo) concert
+  putStrLn "Подробнее:"
+  (putStrLn . addInfo) infoC
+  putStrLn "-----"
+  (putStrLn . moreInfo) infoC
   (print . urlAbout) concert
   putStrLn "-----------------------------------"
 

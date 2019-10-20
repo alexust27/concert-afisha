@@ -16,19 +16,22 @@ import Parser2 (parseFun2)
 import Database (addConcertToDB, createTables, dropTables)
 import UI
 
+
+updateByDate :: Int -> Int -> Int -> IO ()
+updateByDate d m y = do
+  dropTables
+  createTables
+  concerts <- parseFun d m y
+  concerts2 <- parseFun2 d m y
+
+--   mapM_ printConcert concerts
+--   mapM_ printConcert concerts2
+  mapM_ addConcertToDB concerts
+  mapM_ addConcertToDB concerts2
+
+
 main :: IO ()
 main = do
---   gui
---   dropTables
---   createTables
-  let (m, y) = (11, 2019)
-  concerts <- parseFun2 m y
-  mapM_ printConcert concerts
-  mapM_ addConcertToDB concerts
-
-
---   res <- isConcertInDB $ (concerts !! 1)
---   print res
---   concerts2 <- parseFun2 m y
---   mapM_ printConcert concerts2
---   mapM_ addConcertToDB concerts2
+  gui
+--   let (d, m, y) = (21, 10, 2019)
+--   updateByDate d m y

@@ -15,7 +15,6 @@ import Data.Time.LocalTime(TimeOfDay(..))
 -- import Database.PostgreSQL.Simple.Time(parseDay, parseTimeOfDay)
 -- import qualified Data.Text as T
 -- import Control.Applicative
--- import Data.Int(Int64)
 
 import Control.Monad (void)
 import Database.PostgreSQL.Simple (Only(..), Connection, Query, connect, connectDatabase, connectPassword,
@@ -36,7 +35,7 @@ updateOrInsertConcertInDB conn concert = do
   let cPlace = concertPlace concert
   let (cTime, cDate) = getTimeAndDate $ concertDate concert
   let (minPrice, maxPrice, urlBuy) = case concertPrice concert of
-                              Just (Price (prices, URL url)) -> ((prices !! 0), (prices !! 1), url)
+                              Just (Price ((price1, price2), URL url)) -> (price1, price2, url)
                               Nothing -> (-1, -1, "")
   let cAddInfo   = addInfo cInfo
   let fullInfo   = moreInfo cInfo
@@ -80,9 +79,9 @@ insertArtist conn artist = do
                     _ -> ""
   let artistUrl = personId artist
   let qSelectArtists :: Query = [sql|
-      SELECT id_artist FROM artists WHERE ref_about=? AND name=?
+      SELECT id_artist FROM artists WHERE ref_about=?
     |]
-  artistDbId :: [Only Int] <- query conn qSelectArtists (artistUrl, artistName)
+  artistDbId :: [Only Int] <- query conn qSelectArtists (Only artistUrl)
   if null artistDbId then do
     let qInsertInArtists :: Query = [sql|
       INSERT INTO artists (name, role, ref_about) VALUES (?,?,?) returning id_artist
@@ -217,19 +216,19 @@ qToConcert conn (concertId, cName, cPlace, cDay, cTime, cMinPrice, cMaxPrice, cA
                      }
 
   let onePrice = if cMinPrice == -1
-                 then Just $ Price ([cMinPrice, cMaxPrice], (URL refBuy))
-                 else Nothing
+                 then Nothing
+                 else Just $ Price ((cMinPrice, cMaxPrice), (URL refBuy))
 
-  let qSel = [sql|
-        SELECT artist.name, artist.liked, artist.ref_about FROM artist iner join concert_artist
-        ON artist.id_artist = concert_artist.id_artist AND concert_artist.id_concert = ?
-  |]
-  qArtists :: [(String, Bool, String)] <- query conn qSel (Only concertId)
-  let artists = map qArtistToPerson qArtists
+--   let qSel = [sql|
+--         SELECT artists.name, artists.liked, artists.ref_about FROM artists iner join concert_artist
+--         ON artists.id_artist = concert_artist.id_artist AND concert_artist.id_concert = ?
+--   |]
+--   qArtists :: [(String, Bool, String)] <- query conn qSel (Only concertId)
+--   let artists = map qArtistToPerson qArtists
   let allInfo = Info { title      = cName
                      , addInfo    = cAddInfo
                      , moreInfo   = qMoreInfo
-                     , persons    = artists
+                     , persons    = []
                      }
 
   return Concert { concertDate   = oneDate
@@ -247,18 +246,18 @@ getConcertsFromDB searchText minPrice maxPrice cDate = do
         connectPassword = "123",
         connectDatabase = "haskell"
   }
+  putStrLn ("try to get conc" ++ searchText ++ " date=" ++ show (cDate))
   let price1 = if minPrice == -1 then -1 else minPrice
   let price2 = if maxPrice == -1 then 10000000 else maxPrice
   let qDate = case cDate of
-        (ya, m, d) -> show d ++ "-" ++ show m ++ "-" ++ show ya
+        (ya, m, d) -> show d ++ "-" ++ show (m + 1) ++ "-" ++ show ya
 
   let qSel = [sql|
       SELECT * FROM concerts
-      WHERE ? <= minPrice AND maxPrice <= ? AND concert_date=? AND name LIKE '%?%'
+      WHERE ? <= min_price AND max_price <= ? AND concert_date=?
       ORDER BY concert_date ASC, concert_time ASC, min_price ASC, max_price ASC
   |]
-  qConerts <- query conn qSel (price1, price2, qDate, searchText)
+  qConerts <- query conn qSel (price1, price2, qDate)
 
   concc <- mapM (qToConcert conn) qConerts
   return concc
-

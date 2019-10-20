@@ -10,7 +10,6 @@ import Data.Maybe (catMaybes)
 import qualified Data.List as L
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import Text.HTML.TagSoup (Tag, (~/=),(~==), fromAttrib, parseTags, partitions)
-
 toUtfString :: LBS.ByteString -> String
 toUtfString = map (\ch -> case lookup ch rusTable of
                            Just x -> x
@@ -24,8 +23,8 @@ getTextFromTagsUTF = getTextFromTags toUtfString
 mainUrl :: URL
 mainUrl = URL "https://www.philharmonia.spb.ru"
 
-makeUrl :: Int -> Int -> URL
-makeUrl m y = URL $ (urlToStr mainUrl) ++ "/afisha/?ev_y=" ++ (show y) ++ "&ev_m=" ++ (show m)
+makeUrl :: Int -> Int -> Int -> URL
+makeUrl d m y = URL $ (urlToStr mainUrl) ++ "/afisha/?ev_y=" ++ (show y) ++ "&ev_m=" ++ (show m) ++ "&ev_d=" ++ (show d)
 
 parseDate :: Int -> Int -> [Tag LBS.ByteString] -> Date
 parseDate m y block = Date { day = dayFromTag
@@ -100,7 +99,7 @@ parsePeople tags = if needSave then
 
 parsePrice :: [Tag LBS.ByteString] -> Maybe Price
 parsePrice tags = if L.any (isClassInTag pricesTag) tags
-                  then Just $ Price (strToPrice priceBlock), URL ((urlToStr mainUrl) ++ urlToBuy))
+                  then Just $ Price (strToPrice priceBlock, URL ((urlToStr mainUrl) ++ urlToBuy))
                   else Nothing
   where
     toBuyTag = TagClassName "pts_btn btn_buy2"
@@ -121,7 +120,7 @@ parseAfishaList body = partitions (isClassInTag oneItemTag) $ mainContent tagLis
 
 getInfoUrl :: [Tag LBS.ByteString] -> URL
 getInfoUrl block = URL $ (urlToStr mainUrl) ++
-                  (fromAttrib "href" $ LBS.unpack <$> head (dropWhile (not . (isClassInTag titleTag)) block))
+                  (fromAttrib "href" $ toUtfString <$> head (dropWhile (not . (isClassInTag titleTag)) block))
                 where
                   titleTag = TagClassName "mer_item_title hand"
 
@@ -143,10 +142,10 @@ parseOneBlock m y block = do
 -- testUrl = URL "https://www.philharmonia.spb.ru/afisha/323968/"
 -- testUrl = URL "https://www.philharmonia.spb.ru/afisha/"
 
-parseFun :: Int -> Int -> IO [Concert]
-parseFun m y = do
-  body <- getHtml (makeUrl m y)
+parseFun :: Int -> Int -> Int -> IO [Concert]
+parseFun d m y = do
+  body <- getHtml (makeUrl d m y)
   let blocks = parseAfishaList body
-  concerts <- mapM (parseOneBlock m y) $ take 8 $ drop 5 blocks
+  concerts <- mapM (parseOneBlock m y) $ take 8 blocks
   return concerts
 
