@@ -10,8 +10,7 @@ module Common
 , isClassInTag
 , fromTagToTag
 , getHtml
-, getIntFromTag
-, getOneElemFromTags
+, getFirstTextFromTag
 , getTextFromTags
 , getTimeAndDate
 , printConcert
@@ -22,12 +21,11 @@ module Common
 
 import Network.HTTP.Client (httpLbs, newManager, parseRequest, responseBody)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
--- import Network.HTTP.Types.Status (statusCode)
 import Text.HTML.TagSoup (Tag, Tag ( TagOpen ), isTagText, fromAttrib, fromTagText)
+import Data.Char(isDigit)
 import qualified Data.Text as T
 import qualified Data.List as L
 import qualified Data.ByteString.Lazy.Char8 as LBS
-
 
 newtype URL = URL String deriving (Show, Eq)
 newtype TagClassName = TagClassName String
@@ -42,16 +40,16 @@ data Price = Price ( [Int]
                    , URL
                    ) deriving (Eq, Show)
 
-data Person = Person { personName       :: String
-                     , personRole       :: Maybe String
-                     , personId   :: String
+data Person = Person { personName  :: String
+                     , personRole  :: Maybe String
+                     , personId    :: String
+                     , isLiked     :: Bool
                      } deriving (Show, Eq)
 
-data Info = Info { title      :: [String]
-                 , moreInfo   :: String
-                 , persons    :: [Person]
-                 , ansambles  :: [String]
-                 , music      :: [String]
+data Info = Info { title           :: String
+                 , addInfo         :: String
+                 , moreInfo        :: String
+                 , persons         :: [Person]
                  } deriving (Show)
 
 data Concert = Concert { concertDate    :: Date
@@ -85,30 +83,28 @@ fromTagToTag :: TagClassName -> TagClassName -> [Tag LBS.ByteString] -> [Tag LBS
 fromTagToTag start end tags = takeWhile (not . (isClassInTag end))
                             $ tail $ dropWhile (not . (isClassInTag start)) tags
 
-getTextFromTags :: [Tag LBS.ByteString] -> LBS.ByteString
-getTextFromTags tags = delSpaces $ map fromTagText $ filter isTagText tags
+getTextFromTags :: (LBS.ByteString -> String) -> [Tag LBS.ByteString] -> String
+getTextFromTags toStrFun tags = delSpaces $ map (toStrFun . fromTagText) $ filter isTagText tags
   where
-    delSpaces = LBS.unwords . LBS.words . LBS.unwords
+    delSpaces = L.unwords . L.words . L.unwords
 
-getOneElemFromTags :: [Tag LBS.ByteString] -> TagClassName -> Int -> LBS.ByteString
-getOneElemFromTags tags className idx =
-  delSpaces $ fromTagText $ (!!idx) $ filter isTagText $ dropWhile (not . (isClassInTag className)) tags
+
+getFirstTextFromTag :: (LBS.ByteString -> String) -> [Tag LBS.ByteString] -> TagClassName -> String
+getFirstTextFromTag toStrF block className =  if L.null res then "" else toStrF $ fromTagText $ head res
   where
-    delSpaces = LBS.unwords . LBS.words
+    res = dropWhile (not . isTagText) $ dropWhile (not . (isClassInTag className)) block
 
-getIntFromTag :: [Tag LBS.ByteString] -> TagClassName -> Int
-getIntFromTag tags className = case LBS.readInt $ getOneElemFromTags tags className 0 of
-  Just (i, _) -> i
-  Nothing -> (-999)
 
-strToPrice :: LBS.ByteString -> [Int]
-strToPrice str = if L.null resList then []
-                 else [minimum resList, maximum resList]
+strToPrice :: String -> [Int]
+strToPrice str = [mnPrice, max mxPrice mnPrice]
   where
-    f st = case LBS.readInt st of
-      Just (i, _) -> i
-      Nothing -> (-1)
-    resList = filter (> 0) $ map f (LBS.words str)
+    clearStr = L.unwords . L.words $ str
+    mnPrice = toIntPr $ takeWhile (isDigit) clearStr
+    mxPrice = toIntPr $ takeWhile (isDigit) $ dropWhile (not . isDigit) $ dropWhile (isDigit) clearStr
+    toIntPr :: String -> Int
+    toIntPr pr = case pr of
+        [] -> (-1)
+        _ -> read pr
 
 getHtml :: URL -> IO (LBS.ByteString)
 getHtml (URL url) = do
@@ -120,7 +116,7 @@ getHtml (URL url) = do
 
 printConcert :: Concert -> IO()
 printConcert concert = do
-  (putStrLn . unlines . title . concertInfo) concert
+  (putStrLn . title . concertInfo) concert
   (print . concertDate) concert
   case concertPrice concert of
     Nothing -> putStrLn "No tickects"

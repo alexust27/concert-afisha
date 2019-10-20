@@ -6,11 +6,12 @@ module Database
 ( addConcertToDB
 , createTables
 , dropTables
+, getConcertsFromDB
 ) where
 
 -- import Data.Time.Clock(UTCTime(..))
--- import Data.Time.Calendar(Day(..))
--- import Data.Time.LocalTime(TimeOfDay(..))
+import Data.Time.Calendar(Day(..), toGregorian)
+import Data.Time.LocalTime(TimeOfDay(..))
 -- import Database.PostgreSQL.Simple.Time(parseDay, parseTimeOfDay)
 -- import qualified Data.Text as T
 -- import Control.Applicative
@@ -21,7 +22,7 @@ import Database.PostgreSQL.Simple (Only(..), Connection, Query, connect, connect
                                   connectUser, defaultConnectInfo, execute, execute_, executeMany, query)
 import Database.PostgreSQL.Simple.SqlQQ (sql)
 
-import Common (Concert(..), Info(..), Person(..),Price(..), getTimeAndDate, urlToStr)
+import Common (Concert(..), Info(..), Person(..),Price(..), Date(..), URL(..), getTimeAndDate, urlToStr)
 
 
 take1fromListOnly :: [Only a] -> a
@@ -31,15 +32,14 @@ take1fromListOnly [] = error "Can't take from List of Only"
 updateOrInsertConcertInDB :: Connection -> Concert -> IO Int
 updateOrInsertConcertInDB conn concert = do
   let cInfo = concertInfo concert
-  let cName = head $ title $ cInfo
+  let cName = title cInfo
   let cPlace = concertPlace concert
   let (cTime, cDate) = getTimeAndDate $ concertDate concert
-  let (minPrice, maxPrice) = case concertPrice concert of
-                              Just (Price (prices, _)) -> (head prices, (prices !! 1))
-                              Nothing -> (-1, -1)
-  let addInfo = (unlines $ tail $ title $ cInfo) ++ "\n" ++ (unlines $ music cInfo) ++ "\n\n"
-             ++ (unlines $ ansambles cInfo)
-  let fullInfo = moreInfo cInfo
+  let (minPrice, maxPrice, urlBuy) = case concertPrice concert of
+                              Just (Price (prices, URL url)) -> ((prices !! 0), (prices !! 1), url)
+                              Nothing -> (-1, -1, "")
+  let cAddInfo   = addInfo cInfo
+  let fullInfo   = moreInfo cInfo
   let concertUrl = urlToStr $ urlAbout concert
 
   let qSel = [sql|
@@ -53,22 +53,22 @@ updateOrInsertConcertInDB conn concert = do
     let qInsertInConcerts :: Query = [sql|
       INSERT INTO concerts
       (name, place, concert_date, concert_time, min_price,
-       max_price, add_info, more_info, ref_about)
-      VALUES (?,?,?,?,?,?,?,?,?) returning id_concert
+       max_price, add_info, more_info, ref_about, ref_buy)
+      VALUES (?,?,?,?,?,?,?,?,?,?) returning id_concert
     |]
     concertDbId :: [Only Int] <- query conn qInsertInConcerts (cName, cPlace, cDate, cTime, minPrice,
-                                                               maxPrice, addInfo, fullInfo, concertUrl)
+                                                               maxPrice, cAddInfo, fullInfo, concertUrl, urlBuy)
     return $ take1fromListOnly concertDbId
   else do
     let cId = take1fromListOnly ids
     let qUpdateConcerts :: Query = [sql|
           UPDATE concerts SET
            name = ?, place = ?, concert_date = ?, concert_time = ?, min_price = ?,
-           max_price = ?, add_info = ?, more_info = ?, ref_about = ?
+           max_price = ?, add_info = ?, more_info = ?, ref_about = ?, ref_buy = ?
           WHERE id_concert = ?
     |]
-    void $ execute conn qUpdateConcerts (cName, cPlace, cDate, cTime, minPrice,
-                                           maxPrice, addInfo, fullInfo, concertUrl, cId)
+    void $ execute conn qUpdateConcerts (cName, cPlace, cDate, cTime, minPrice, maxPrice,
+                                         cAddInfo, fullInfo, concertUrl, urlBuy, cId)
     return cId
 
 
@@ -161,11 +161,12 @@ createTables = do
         place        varchar(100) not null,
         concert_date date         not null,
         concert_time time         not null,
-        max_price    integer,
         min_price    integer,
+        max_price    integer,
         add_info     text,
         more_info    text,
-        ref_about    varchar(300) not null
+        ref_about    varchar(300) not null,
+        ref_buy      varchar(300)
     );
     alter table concerts
         owner to postgres;
@@ -192,12 +193,72 @@ dropTables = do
   }
 
   let qDrop = [sql|
-    drop table artists;
-    drop table concerts;
-    drop table concert_artist;
+    drop table IF EXISTS artists;
+    drop table IF EXISTS concerts;
+    drop table IF EXISTS concert_artist;
   |]
 
   void $ execute_ conn qDrop
 
+qArtistToPerson :: (String, Bool, String) -> Person
+qArtistToPerson (pName, liked, reff) = Person { personName  = pName
+                                              , personRole  = Nothing
+                                              , personId    = reff
+                                              , isLiked     = liked
+                                              }
 
--- getByPrice :: Int -> Int
+qToConcert :: Connection -> (Int, String, String, Day, TimeOfDay, Int, Int, String, String, String, String) -> IO Concert
+qToConcert conn (concertId, cName, cPlace, cDay, cTime, cMinPrice, cMaxPrice, cAddInfo, qMoreInfo, refInfo, refBuy) = do
+  let (yr, m, d) = toGregorian cDay
+  let oneDate = Date { day   = d
+                     , month = m
+                     , year  = fromInteger yr
+                     , time  = show cTime
+                     }
+
+  let onePrice = if cMinPrice == -1
+                 then Just $ Price ([cMinPrice, cMaxPrice], (URL refBuy))
+                 else Nothing
+
+  let qSel = [sql|
+        SELECT artist.name, artist.liked, artist.ref_about FROM artist iner join concert_artist
+        ON artist.id_artist = concert_artist.id_artist AND concert_artist.id_concert = ?
+  |]
+  qArtists :: [(String, Bool, String)] <- query conn qSel (Only concertId)
+  let artists = map qArtistToPerson qArtists
+  let allInfo = Info { title      = cName
+                     , addInfo    = cAddInfo
+                     , moreInfo   = qMoreInfo
+                     , persons    = artists
+                     }
+
+  return Concert { concertDate   = oneDate
+                 , concertPrice  = onePrice
+                 , concertInfo   = allInfo
+                 , concertPlace  = cPlace
+                 , urlAbout      = URL refInfo
+                 }
+
+
+getConcertsFromDB :: String -> Int -> Int -> (Int, Int, Int) -> IO [Concert]
+getConcertsFromDB searchText minPrice maxPrice cDate = do
+  conn <- connect defaultConnectInfo {
+        connectUser = "postgres",
+        connectPassword = "123",
+        connectDatabase = "haskell"
+  }
+  let price1 = if minPrice == -1 then -1 else minPrice
+  let price2 = if maxPrice == -1 then 10000000 else maxPrice
+  let qDate = case cDate of
+        (ya, m, d) -> show d ++ "-" ++ show m ++ "-" ++ show ya
+
+  let qSel = [sql|
+      SELECT * FROM concerts
+      WHERE ? <= minPrice AND maxPrice <= ? AND concert_date=? AND name LIKE '%?%'
+      ORDER BY concert_date ASC, concert_time ASC, min_price ASC, max_price ASC
+  |]
+  qConerts <- query conn qSel (price1, price2, qDate, searchText)
+
+  concc <- mapM (qToConcert conn) qConerts
+  return concc
+

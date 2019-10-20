@@ -18,13 +18,13 @@ import UI
 
 main :: IO ()
 main = do
-  gui
+--   gui
 --   dropTables
 --   createTables
---   let (m, y) = (11, 2019)
---   concerts <- parseFun m y
---   mapM_ printConcert concerts
---   mapM_ addConcertToDB concerts
+  let (m, y) = (11, 2019)
+  concerts <- parseFun2 m y
+  mapM_ printConcert concerts
+  mapM_ addConcertToDB concerts
 
 
 --   res <- isConcertInDB $ (concerts !! 1)
