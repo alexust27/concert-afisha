@@ -20,8 +20,8 @@ license-file:   LICENSE
 category:       Web
 build-type:     Simple
 
---extra-source-files:
---    README.md
+extra-source-files:
+    README.md
 --    ChangeLog.md
 
 --source-repository head
@@ -31,9 +31,10 @@ build-type:     Simple
 library
   hs-source-dirs:   src
   exposed-modules:  Common
-                  , Database
+                  , ParsingUtils
                   , Parser1
                   , Parser2
+                  , Database
                   , UI
   ghc-options:      -Wall
   build-depends:    base
@@ -46,16 +47,7 @@ library
                   , time
                   , postgresql-simple
                   , utf8-string
---                    , http-conduit
---                    , text-icu
---                    , containers
---                    , encoding
---                    , html-conduit
---                    , html-charset
---                    , HTTP
---                    , http-types
---  default-extensions:  OverloadedStrings
---                     , NoMonomorphismRestriction
+
   extra-libraries:   gmodule-2.0
   default-language:    Haskell2010
 
@@ -67,24 +59,3 @@ executable concert-afisha
                         bytestring,
                         concert-afisha
   default-language:     Haskell2010
-
---executable afisha
---  main-is:              UI.hs
---  hs-source-dirs:       app
---  ghc-options:          -Werror -threaded -rtsopts -with-rtsopts=-N
---  build-depends:        base
---                      , bytestring
---  default-language:     Haskell2010
-
---test-suite concert-afisha-test
---  type: exitcode-stdio-1.0
---  main-is: Spec.hs
---  other-modules:
---      Paths_concert_afisha
---  hs-source-dirs:
---      test
---  ghc-options: -threaded -rtsopts -with-rtsopts=-N
---  build-depends:
---      base >=4.7 && <5
---    , concert-afisha
---  default-language: Haskell2010

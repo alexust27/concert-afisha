@@ -1,24 +1,23 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-module UI where
+module UI
+( startGui
+) where
 
-import Control.Monad(void)
--- import Control.Monad.IO.Class
--- import Data.IORef
+import Control.Monad (void)
+import Data.Char (isDigit)
 import Graphics.UI.Gtk
--- import Graphics.UI.Gtk.Glade
-import Graphics.UI.Gtk.Builder(builderGetObject)
-import Data.Char(isDigit)
-import Database(getConcertsFromDB)
-import Common (Concert(..), Info(..), Person(..), Price(..), getTimeAndDate, urlToStr)
+import Graphics.UI.Gtk.Builder (builderGetObject)
 
--- hello :: (ButtonClass o) => o -> IO ()
--- hello b = set b [buttonLabel := "Hello World"]
+import Common (Concert(..), Info(..), Person(..), Price(..), getTimeAndDate, urlToStr)
+import Database (getConcertsFromDB, updateByDate)
+
 
 concertToBox :: Concert -> IO Box
 concertToBox concert = do
   builder2 <- builderNew
-  builderAddFromFile builder2 "oneBlock.glade"
+  builderAddFromFile builder2 "maket/oneBlock.glade"
   concertBox      <- builderGetObject builder2 castToBox "one_concert_box"
+  artistsBox      <- builderGetObject builder2 castToBox "box_artists"
   timeLabel       <- builderGetObject builder2 castToLabel "label_time"
   dateLabel       <- builderGetObject builder2 castToLabel "label_date"
   nameLabel       <- builderGetObject builder2 castToLabel "label_name"
@@ -28,9 +27,6 @@ concertToBox concert = do
   buttonBuy       <- builderGetObject builder2 castToLinkButton "linkbutton_buy"
   buttonAbout     <- builderGetObject builder2 castToLinkButton "linkbutton_about"
   infoTextBuffer  <- builderGetObject builder2 castToTextBuffer "textbuffer_info"
-
---   labelSetText Label str
---   textBufferSetText infoTextBuffer txtt
 
   let infoC = concertInfo concert
   labelSetText nameLabel (title infoC)
@@ -51,28 +47,41 @@ concertToBox concert = do
   set buttonAbout [linkButtonURI := (urlToStr $ urlAbout concert) ]
   set buttonBuy   [linkButtonURI := urlBuy ]
 
---   let people = persons infoC
---   mapM_ (putStrLn . personName) people
---   let rr pr = case personRole pr of
---                 Just x -> x
---                 Nothing -> ""
---   mapM_ (putStrLn . rr) people
---   mapM_ (print . personId) people
-
-
+  let people = persons infoC
+  print (length people)
+  personBoxes <- mapM personToBox people
+  print (length personBoxes)
+  mapM_ (containerAdd artistsBox) personBoxes
   return concertBox
 
-gui :: IO ()
-gui = do
+personToBox :: Person -> IO Box
+personToBox p = do
+  builder3 <- builderNew
+  builderAddFromFile builder3 "maket/onePerson.glade"
+  box <- builderGetObject builder3 castToBox "box1"
+  b <- builderGetObject builder3 castToToggleButton "togglebutton1"
+  labl <- builderGetObject builder3 castToLabel "person1"
+
+  let pn = personName p
+  let liked = isLiked p
+  labelSetText labl pn
+  toggleButtonSetActive b liked
+  return box
+
+
+
+startGui :: IO ()
+startGui = do
   void initGUI
-  window          <- windowNew
-  set window [ windowTitle := "афиша", windowDefaultWidth := 800, windowDefaultHeight := 700]
+  window <- windowNew
+  set window [ windowTitle := "афиша", windowDefaultWidth := 1200, windowDefaultHeight := 700]
 
   builder <- builderNew
-  builderAddFromFile builder "afisha.glade"
+  builderAddFromFile builder "maket/afisha.glade"
   window2         <- builderGetObject builder castToWindow "main_window"
   searchButton    <- builderGetObject builder castToButton "search_button"
   searchEntry     <- builderGetObject builder castToEntry "search_entry"
+  daysEntry       <- builderGetObject builder castToEntry "days_entry"
   calendar        <- builderGetObject builder castToCalendar "calendar1"
   minPriceEntry   <- builderGetObject builder castToEntry "min_price_entry"
   maxPriceEntry   <- builderGetObject builder castToEntry "max_price_entry"
@@ -90,66 +99,21 @@ gui = do
     putStrLn searchText
     entrySetText searchEntry ""
     cDate <- calendarGetDate calendar
---       (cYear, cMonth, cDay) <- calendarGetDate calendar
     minPrice   <- entryGetText minPriceEntry
     maxPrice   <- entryGetText maxPriceEntry
+    daysE      <- entryGetText daysEntry
     let minPr :: Int = if null minPrice || not (all isDigit minPrice) then -1 else read minPrice
     let maxPr :: Int = if null maxPrice || not (all isDigit maxPrice) then -1 else read maxPrice
-    concerts <- getConcertsFromDB searchText minPr maxPr cDate
+    let days  :: Int = if null daysE    || not (all isDigit daysE)    then 1  else read daysE
+    concerts <- getConcertsFromDB searchText days minPr maxPr cDate
     addedBlocks <- mapM concertToBox concerts
     mapM_ (containerAdd veiwBox) addedBlocks
 
-  void $ searchButton `on` buttonActivated $ do
+  void $ updateButton `on` buttonActivated $ do
+      (cYear, cMonth, cDay) <- calendarGetDate calendar
+      updateByDate cDay (cMonth + 1) cYear
 
   widgetShowAll window
   void $ on window objectDestroy mainQuit
   mainGUI
 
-
---   onClicked button (hello button)
---   Just xml <- xmlNew "afishaMaket.glade"
---   window   <- xmlGetWidget xml castToWindow "window1"
---   onDestroy window mainQuit
-
---   window <- windowNew
---   set window [ windowTitle := "Афиша концертов",
---                containerBorderWidth := 10 ]
---
---   searchButton <- buttonNewWithLabel "Поиск"
---
---   set searchButton [ widgetHExpand := True ]
---
---   butBox <- hBoxNew True 0
---   containerAdd butBox searchButton
---
---   grid <- gridNew
---   gridAttach grid butBox 0 0 1 1
---
---   vbox <- vBoxNew False 0
---   containerAdd vbox grid
---
--- --   note <- notebookNew
---   containerAdd window vbox
---
---   windowMaximize window
---   widgetShowAll window
---
---
-
-
-
-
---   quitButton <- buttonNewWithLabel "Quit"
---   onClicked quitButton mainQuit
---   void $ window `on` deleteEvent $ liftIO mainQuit >> return False -- Закрытие окна
-
-
-
---   window <- windowNew
---   button <- buttonNew
---   set window [windowDefaultWidth := 800, windowDefaultHeight := 700,
---               containerChild := button, containerBorderWidth := 13]
---   onClicked button (hello button)
---   onDestroy window mainQuit
---   widgetShowAll window
---   mainGUI

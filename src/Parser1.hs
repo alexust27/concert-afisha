@@ -3,19 +3,23 @@ module Parser1
   ( parseFun
   ) where
 
-import Common ( Concert(..), Date(..), Info(..), Person(..), Price(..), TagClassName(..), URL(..), isClassInTag,
-                fromTagToTag, getHtml, getFirstTextFromTag, getTextFromTags, strToPrice, urlToStr)
+import Common ( Concert(..), Date(..), Info(..), Person(..), Price(..), URL(..), urlToStr)
+import ParsingUtils ( TagClassName(..), isClassInTag, fromTagToTag, getHtml,
+                      getFirstTextFromTag, getTextFromTags, strToPrice )
 
 import Data.Maybe (catMaybes)
 import qualified Data.List as L
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import Text.HTML.TagSoup (Tag, (~/=),(~==), fromAttrib, parseTags, partitions)
+
+
 toUtfString :: LBS.ByteString -> String
 toUtfString = map (\ch -> case lookup ch rusTable of
                            Just x -> x
                            _ -> ch
                   ) . LBS.unpack
   where rusTable = zip (('\168'):('\184'):['\192'..'\255']) (('Ё'):('ё'):['А'..'я'])
+
 
 getTextFromTagsUTF :: [Tag LBS.ByteString] -> String
 getTextFromTagsUTF = getTextFromTags toUtfString
@@ -138,9 +142,6 @@ parseOneBlock m y block = do
                         , urlAbout      = infoUrl
                         }
   return concert
-
--- testUrl = URL "https://www.philharmonia.spb.ru/afisha/323968/"
--- testUrl = URL "https://www.philharmonia.spb.ru/afisha/"
 
 parseFun :: Int -> Int -> Int -> IO [Concert]
 parseFun d m y = do

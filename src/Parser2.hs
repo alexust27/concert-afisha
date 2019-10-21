@@ -3,8 +3,9 @@ module Parser2
   ( parseFun2
   ) where
 
-import Common ( Concert(..), Date(..), Info(..), Person(..), Price(..), TagClassName(..), URL(..), isClassInTag,
-                fromTagToTag, getHtml, getTextFromTags, getFirstTextFromTag, strToPrice, urlToStr)
+import Common ( Concert(..), Date(..), Info(..), Person(..), Price(..), URL(..), urlToStr)
+import ParsingUtils ( TagClassName(..), isClassInTag, fromTagToTag, getHtml,
+                      getFirstTextFromTag, getTextFromTags, strToPrice )
 
 import Data.Char (isSpace, chr)
 import Data.Maybe (catMaybes)
@@ -21,9 +22,6 @@ getTextFromTagsUTF = getTextFromTags toString
 mainUrl :: URL
 mainUrl = URL "https://www.mariinsky.ru"
 
-makeUrl2 :: Int -> Int -> Int -> URL
-makeUrl2 d m y = URL $ (urlToStr mainUrl) ++ "/ru/playbill/playbill/?year=" ++ (show y)
-              ++ "&month=" ++ (show m) ++ "&day=" ++ (show d)
 
 makeUrl :: Int -> Int -> URL
 makeUrl m y = URL $ (urlToStr mainUrl) ++ "/ru/playbill/playbill/?year=" ++ (show y)
@@ -147,9 +145,6 @@ parseAfishaList body = partitions (isClassInTag oneItemTag) mainContent
     mainContent :: [Tag LBS.ByteString]
     mainContent = takeWhile (not . (isClassInTag lastContentTag))
                 $ dropWhile (~/= "<div id=\"afisha\">") tagList
-
-
--- testUrl = URL "https://www.mariinsky.ru/ru/playbill/playbill/?year=2019&month=11&place=theatre"
 
 parseFun2 :: Int -> Int -> Int -> IO ([Concert])
 parseFun2 d m y = do

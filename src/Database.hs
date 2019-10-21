@@ -3,25 +3,30 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 module Database
-( addConcertToDB
-, createTables
-, dropTables
-, getConcertsFromDB
+( getConcertsFromDB
+, updateByDate
 ) where
 
--- import Data.Time.Clock(UTCTime(..))
+import Control.Monad (void)
 import Data.Time.Calendar(Day(..), toGregorian)
 import Data.Time.LocalTime(TimeOfDay(..))
--- import Database.PostgreSQL.Simple.Time(parseDay, parseTimeOfDay)
--- import qualified Data.Text as T
--- import Control.Applicative
-
-import Control.Monad (void)
 import Database.PostgreSQL.Simple (Only(..), Connection, Query, connect, connectDatabase, connectPassword,
                                   connectUser, defaultConnectInfo, execute, execute_, executeMany, query)
 import Database.PostgreSQL.Simple.SqlQQ (sql)
 
-import Common (Concert(..), Info(..), Person(..),Price(..), Date(..), URL(..), getTimeAndDate, urlToStr)
+import Common (Concert(..), Info(..), Person(..), Price(..), Date(..), URL(..), getTimeAndDate, urlToStr)
+import Parser1 (parseFun)
+import Parser2 (parseFun2)
+
+updateByDate :: Int -> Int -> Int -> IO ()
+updateByDate d m y = do
+--   dropTables
+--   createTables
+  concerts <- parseFun d m y
+  concerts2 <- parseFun2 d m y
+
+  mapM_ addConcertToDB concerts
+  mapM_ addConcertToDB concerts2
 
 
 take1fromListOnly :: [Only a] -> a
@@ -219,16 +224,16 @@ qToConcert conn (concertId, cName, cPlace, cDay, cTime, cMinPrice, cMaxPrice, cA
                  then Nothing
                  else Just $ Price ((cMinPrice, cMaxPrice), (URL refBuy))
 
---   let qSel = [sql|
---         SELECT artists.name, artists.liked, artists.ref_about FROM artists iner join concert_artist
---         ON artists.id_artist = concert_artist.id_artist AND concert_artist.id_concert = ?
---   |]
---   qArtists :: [(String, Bool, String)] <- query conn qSel (Only concertId)
---   let artists = map qArtistToPerson qArtists
+  let qSel = [sql|
+        SELECT artists.name, artists.liked, artists.ref_about FROM artists INNER JOIN concert_artist
+        ON artists.id_artist = concert_artist.id_artist AND concert_artist.id_concert = ?
+  |]
+  qArtists :: [(String, Bool, String)] <- query conn qSel (Only concertId)
+  let artists = map qArtistToPerson qArtists
   let allInfo = Info { title      = cName
                      , addInfo    = cAddInfo
                      , moreInfo   = qMoreInfo
-                     , persons    = []
+                     , persons    = artists
                      }
 
   return Concert { concertDate   = oneDate
@@ -239,25 +244,28 @@ qToConcert conn (concertId, cName, cPlace, cDay, cTime, cMinPrice, cMaxPrice, cA
                  }
 
 
-getConcertsFromDB :: String -> Int -> Int -> (Int, Int, Int) -> IO [Concert]
-getConcertsFromDB searchText minPrice maxPrice cDate = do
+getConcertsFromDB :: String -> Int -> Int -> Int -> (Int, Int, Int) -> IO [Concert]
+getConcertsFromDB searchText days minPrice maxPrice cDate = do
   conn <- connect defaultConnectInfo {
         connectUser = "postgres",
         connectPassword = "123",
         connectDatabase = "haskell"
   }
-  putStrLn ("try to get conc" ++ searchText ++ " date=" ++ show (cDate))
   let price1 = if minPrice == -1 then -1 else minPrice
   let price2 = if maxPrice == -1 then 10000000 else maxPrice
-  let qDate = case cDate of
+  let qDate1 = case cDate of
         (ya, m, d) -> show d ++ "-" ++ show (m + 1) ++ "-" ++ show ya
+  let qDate2 = case cDate of
+        (ya, m, d) -> show (d + days) ++ "-" ++ show (m + 1) ++ "-" ++ show ya
+  putStrLn ("try to get conc: " ++ searchText ++ " date=" ++ qDate1 )
 
   let qSel = [sql|
       SELECT * FROM concerts
-      WHERE ? <= min_price AND max_price <= ? AND concert_date=?
+      WHERE ? <= max_price AND min_price <= ? AND ? <= concert_date AND concert_date < ?
+        AND (name SIMILAR TO '%' || ? || '%'  OR more_info SIMILAR TO '%' || ? || '%')
       ORDER BY concert_date ASC, concert_time ASC, min_price ASC, max_price ASC
   |]
-  qConerts <- query conn qSel (price1, price2, qDate)
+  qConerts <- query conn qSel (price1, price2, qDate1, qDate2, searchText, searchText)
 
   concc <- mapM (qToConcert conn) qConerts
   return concc
